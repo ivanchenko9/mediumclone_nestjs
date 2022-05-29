@@ -1,6 +1,6 @@
 import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { hash } from 'bcrypt';
-import { SALT_AMOUNT } from '@app/constants/users';
+import { SALT_AMOUNT } from '@app/constants/users.config';
 
 @Entity({ name: 'users' })
 export class UserEntity {
