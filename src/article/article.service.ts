@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, getRepository, Repository } from 'typeorm';
 import { ArticleEntity } from './article.entity';
 import { CreateArticleDto } from './dto/createArticle.dto';
-import { ArticleResponceInterface } from './types/articleResponce.interface';
+import { ArticleResponceInterface } from './types/articleResponse.interface';
 import slugify from 'slugify';
 import { UpdateArticleDto } from './dto/updateArticle.dto';
 import { ArticlesResponseInterface } from './types';
