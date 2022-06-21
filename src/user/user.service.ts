@@ -17,17 +17,25 @@ export class UserService {
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<UserEntity> {
+    const errorResponse = {
+      errors: {},
+    };
     const userByEmail = await this.userRepository.findOne({
       email: createUserDto.email,
     });
     const userByUsername = await this.userRepository.findOne({
       username: createUserDto.username,
     });
+
+    if (userByEmail) {
+      errorResponse.errors['email'] = 'Has already been taken';
+    }
+    if (userByUsername) {
+      errorResponse.errors['username'] = 'Has already been taken';
+    }
+
     if (userByEmail || userByUsername) {
-      throw new HttpException(
-        'Email or username are already taken',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
+      throw new HttpException(errorResponse, HttpStatus.UNPROCESSABLE_ENTITY);
     }
     const newUser = new UserEntity();
     Object.assign(newUser, createUserDto);
@@ -47,6 +55,9 @@ export class UserService {
   }
 
   async login(loginUserDto: LoginUserDto): Promise<UserEntity> {
+    const errorResponse = {
+      errors: {},
+    };
     const user = await this.userRepository.findOne(
       {
         email: loginUserDto.email,
@@ -54,19 +65,20 @@ export class UserService {
       { select: ['id', 'username', 'bio', 'email', 'image', 'password'] },
     );
     if (!user) {
-      throw new HttpException(
-        'User with such email not found',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
+      errorResponse.errors['email'] = 'User with such email not found';
+    }
+    if (!user) {
+      throw new HttpException(errorResponse, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     const isPasswordValid = await compare(loginUserDto.password, user.password);
 
     if (!isPasswordValid) {
-      throw new HttpException(
-        'Check your password',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
+      errorResponse.errors['password'] = 'Check your password';
+    }
+
+    if (!isPasswordValid) {
+      throw new HttpException(errorResponse, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     delete user.password;
